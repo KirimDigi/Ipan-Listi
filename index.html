@@ -2481,29 +2481,34 @@
 					data-e-type="widget" data-element_type="widget" data-id="e9aaf0b" data-widget_type="html.default">
 					<div class="elementor-widget-container">
 						<script>
-							//Script Custom Nama Tamu by Andy dari WeddingPress
-							var urlParams = new URLSearchParams(window.location.search);
-							if (urlParams) {
-								var textElement = document.getElementById('namatamu');
+							//Script Custom Nama Tamu by Andy dari WeddingPress - Diperbarui untuk mendukung query (?) dan hash (#)
+							function getParam(name) {
+								var searchParams = new URLSearchParams(window.location.search);
+								if (searchParams.has(name)) {
+									return searchParams.get(name);
+								}
+								if (window.location.hash) {
+									var hashClean = window.location.hash.substring(1);
+									if (hashClean.indexOf('&') !== -1 || hashClean.indexOf('=') !== -1) {
+										var hashParams = new URLSearchParams(hashClean);
+										if (hashParams.has(name)) {
+											return hashParams.get(name);
+										}
+									}
+									var match = hashClean.match(new RegExp('(?:^|&)' + name + '=([^&]*)'));
+									if (match) {
+										return decodeURIComponent(match[1]);
+									}
+								}
+								return null;
+							}
+
+							var toValue = getParam('to') || getParam('dear') || getParam('kepada');
+							var textElement = document.getElementById('namatamu');
+							if (textElement && toValue) {
 								var defaultText = textElement.innerHTML;
-								var newText = defaultText;
-
-								if (urlParams.has('to')) {
-									var toValue = urlParams.get('to');
-									newText = newText.replace(/Nama Tamu/g, toValue);
-								}
-
-								if (urlParams.has('dear')) {
-									var dearValue = urlParams.get('dear');
-									newText = newText.replace(/Nama Tamu/g, dearValue);
-								}
-
-								if (urlParams.has('kepada')) {
-									var kepadaValue = urlParams.get('kepada');
-									newText = newText.replace(/Nama Tamu/g, kepadaValue);
-								}
-
-								textElement.innerHTML = newText;
+								// Hapus teks pembungkus HTML h2 jika isinya persis Nama Tamu
+								textElement.innerHTML = defaultText.replace(/Nama Tamu/g, toValue);
 							}
 						</script>
 					</div>
